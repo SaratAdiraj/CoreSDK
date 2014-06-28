@@ -1,0 +1,13 @@
+C:\coresdk_git\coresdk\Cs2hx\obj\x64\Debug\Cs2hx.csprojResolveAssemblyReference.cache
+C:\coresdk_git\coresdk\Cs2hx\obj\x64\Debug\corecs.exe
+C:\coresdk_git\coresdk\Cs2hx\obj\x64\Debug\corecs.pdb
+C:\coresdk_git\coresdk\Cs2hx\bin\Translations.xml
+C:\coresdk_git\coresdk\Cs2hx\bin\corecs.exe.config
+C:\coresdk_git\coresdk\Cs2hx\bin\corecs.exe
+C:\coresdk_git\coresdk\Cs2hx\bin\corecs.pdb
+C:\coresdk_git\coresdk\Cs2hx\bin\Roslyn.Compilers.CSharp.dll
+C:\coresdk_git\coresdk\Cs2hx\bin\Roslyn.Compilers.dll
+C:\coresdk_git\coresdk\Cs2hx\bin\Roslyn.Services.CSharp.dll
+C:\coresdk_git\coresdk\Cs2hx\bin\Roslyn.Services.dll
+C:\coresdk_git\coresdk\Cs2hx\bin\Roslyn.Utilities.dll
+C:\coresdk_git\coresdk\Cs2hx\bin\Roslyn.Utilities.xml
