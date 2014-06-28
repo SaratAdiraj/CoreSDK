@@ -1,0 +1,12 @@
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\Translations.xml
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\UnitTestProject1.dll.config
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\UnitTestProject1.dll
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\UnitTestProject1.pdb
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\Cs2hx.exe
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\Roslyn.Compilers.CSharp.dll
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\Roslyn.Compilers.dll
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\Roslyn.Services.CSharp.dll
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\bin\x64\Debug\Cs2hx.pdb
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\obj\x64\Debug\Test.csprojResolveAssemblyReference.cache
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\obj\x64\Debug\UnitTestProject1.dll
+C:\cs2hx\cs2hx_422f383f48bd\trunk\Test\obj\x64\Debug\UnitTestProject1.pdb

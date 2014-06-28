@@ -1,0 +1,15 @@
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Translations.xml
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\UnitTestProject1.dll.config
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\UnitTestProject1.dll
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\UnitTestProject1.pdb
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\corecs.exe
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Roslyn.Compilers.CSharp.dll
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Roslyn.Compilers.dll
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Roslyn.Services.CSharp.dll
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Roslyn.Services.dll
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Roslyn.Utilities.dll
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\corecs.pdb
+C:\cs2hx\cs2hx\trunk\Test\bin\Release\Roslyn.Utilities.xml
+C:\cs2hx\cs2hx\trunk\Test\obj\Release\Test.csprojResolveAssemblyReference.cache
+C:\cs2hx\cs2hx\trunk\Test\obj\Release\UnitTestProject1.dll
+C:\cs2hx\cs2hx\trunk\Test\obj\Release\UnitTestProject1.pdb
