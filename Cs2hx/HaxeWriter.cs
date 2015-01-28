@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Roslyn.Compilers.CSharp;
 
 namespace Cs2hx
 {

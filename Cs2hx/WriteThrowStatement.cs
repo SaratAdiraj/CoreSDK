@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
+
 
 namespace Cs2hx
 {
@@ -59,7 +61,7 @@ namespace Cs2hx
 				if (lambda1 != null || lambda2 != null)
 				{
 					var lambda = lambda1 == null ? (ExpressionSyntax)lambda2 : (ExpressionSyntax)lambda1;
-					var methodSymbol = Program.GetModel(lambda).GetTypeInfo(lambda).ConvertedType.As<NamedTypeSymbol>().DelegateInvokeMethod.As<MethodSymbol>();
+					var methodSymbol = Program.GetModel(lambda).GetTypeInfo(lambda).ConvertedType.As<INamedTypeSymbol>().DelegateInvokeMethod.As<IMethodSymbol>();
 
 					return methodSymbol.ReturnsVoid;
 				}

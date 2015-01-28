@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
+
 
 namespace Cs2hx
 {
@@ -17,13 +20,13 @@ namespace Cs2hx
                 //check if the property belongs to an abstract type
                 //if it belongs ....then add the following boilerplate accessor code
 					
-                if (property.Modifiers.Any(SyntaxKind.OverrideKeyword))
+				if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.OverrideKeyword))
                     writer.Write("override ");
-                if (property.Modifiers.Any(SyntaxKind.PublicKeyword) || property.Modifiers.Any(SyntaxKind.ProtectedKeyword) || property.Modifiers.Any(SyntaxKind.InternalKeyword))
+				if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword) || property.Modifiers.Any(SyntaxKind.ProtectedKeyword) || property.Modifiers.Any(SyntaxKind.InternalKeyword))
                     writer.Write("public ");
-                if (property.Modifiers.Any(SyntaxKind.PrivateKeyword))
+				if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword))
                     writer.Write("private ");
-                if (property.Modifiers.Any(SyntaxKind.StaticKeyword))
+				if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.StaticKeyword))
                     writer.Write("static ");
 
                 writer.Write("function ");
@@ -40,7 +43,7 @@ namespace Cs2hx
                 writer.WriteLine();
 				writer.WriteOpenBrace();
 
-                if (property.Modifiers.Any(SyntaxKind.AbstractKeyword))
+				if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.AbstractKeyword))
                 {
                     writer.WriteLine("return throw new Exception(\"Abstract item called\");");
                 }
@@ -60,8 +63,8 @@ namespace Cs2hx
 				writer.WriteLine();
             };
 
-            var getter = property.AccessorList.Accessors.SingleOrDefault(o => o.Keyword.Kind == SyntaxKind.GetKeyword);
-            var setter = property.AccessorList.Accessors.SingleOrDefault(o => o.Keyword.Kind == SyntaxKind.SetKeyword);
+			var getter = property.AccessorList.Accessors.SingleOrDefault(o => o.Keyword.Kind() == SyntaxKind.GetKeyword);
+			var setter = property.AccessorList.Accessors.SingleOrDefault(o => o.Keyword.Kind() == SyntaxKind.SetKeyword);
 
             if (getter == null && setter == null)
                 throw new Exception("Property must have either a get or a set");
@@ -75,13 +78,13 @@ namespace Cs2hx
             {
 
 
-				if (!property.Modifiers.Any(SyntaxKind.OverrideKeyword))
+				if (!property.Modifiers.Any(m => m.Kind() == SyntaxKind.OverrideKeyword))
                 {
                     //Write the property declaration.  Overridden properties don't need this.
                     writer.WriteIndent();
-					if (property.Modifiers.Any(SyntaxKind.PublicKeyword) || property.Modifiers.Any(SyntaxKind.InternalKeyword))
+					if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword) || property.Modifiers.Any(m => m.Kind() == SyntaxKind.InternalKeyword))
                         writer.Write("public ");
-					if (property.Modifiers.Any(SyntaxKind.StaticKeyword))
+					if (property.Modifiers.Any(m => m.Kind() == SyntaxKind.StaticKeyword))
                         writer.Write("static ");
 
                     writer.Write("var ");

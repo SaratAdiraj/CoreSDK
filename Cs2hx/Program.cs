@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
 using System.IO;
-using Roslyn.Compilers.Common;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using Cs2hx.Translations;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cs2hx
 {
@@ -36,7 +35,7 @@ namespace Cs2hx
 
 		public static HashSet<string> StaticConstructors = new HashSet<string>();
 		public static ConcurrentDictionary<SyntaxNode, object> DoNotWrite = new ConcurrentDictionary<SyntaxNode, object>();
-		public static ConcurrentDictionary<Symbol, object> RefOutSymbols = new ConcurrentDictionary<Symbol, object>();
+		public static ConcurrentDictionary<ISymbol, object> RefOutSymbols = new ConcurrentDictionary<ISymbol, object>();
 		public static string OutDir;
 
 		public static void Go(Compilation compilation, string outDir, IEnumerable<string> extraTranslation)
@@ -60,7 +59,7 @@ namespace Cs2hx
 
 			var allTypes = compilation.SyntaxTrees
 				.SelectMany(o => o.GetRoot().DescendantNodes().OfType<BaseTypeDeclarationSyntax>())
-				.Select(o => new { Syntax = o, Symbol = GetModel(o).GetDeclaredSymbol(o), TypeName = WriteType.TypeName(GetModel(o).GetDeclaredSymbol(o)) })
+				.Select(o => new { Syntax = o, Symbol = GetModel(o).GetDeclaredSymbol(o), TypeName = WriteType.TypeName((INamedTypeSymbol)GetModel(o).GetDeclaredSymbol(o)) })
 				.GroupBy(o => o.Symbol.ContainingNamespace.FullName() + "." + o.TypeName)
 				.ToList();
 
@@ -85,7 +84,7 @@ namespace Cs2hx
 				{
 					TypeState.Instance = new TypeState();
 					TypeState.Instance.TypeName = type.First().TypeName;
-					TypeState.Instance.Partials = type.Select(o => new TypeState.SyntaxAndSymbol { Symbol = o.Symbol, Syntax = o.Syntax })
+					TypeState.Instance.Partials = type.Select(o => new TypeState.SyntaxAndSymbol { Symbol = (INamedTypeSymbol)o.Symbol, Syntax = o.Syntax })
 						.Where(o => !DoNotWrite.ContainsKey(o.Syntax))
 						.ToList();
 

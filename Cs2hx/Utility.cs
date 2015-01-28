@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using Roslyn.Compilers.CSharp;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cs2hx
 {
@@ -23,14 +24,14 @@ namespace Cs2hx
 		}
 
 
-		public static string FullName(this NamespaceSymbol ns)
+		public static string FullName(this INamespaceSymbol ns)
 		{
 			if (ns.IsGlobalNamespace)
 				return "";
 			else
 				return ns.ToString();
 		}
-		public static string FullNameWithDot(this NamespaceSymbol ns)
+		public static string FullNameWithDot(this INamespaceSymbol ns)
 		{
 			if (ns.IsGlobalNamespace)
 				return "";
@@ -102,7 +103,7 @@ namespace Cs2hx
 			return s.Substring(0, i);
 		}
 
-		public static MethodSymbol UnReduce(this MethodSymbol methodSymbol)
+		public static IMethodSymbol UnReduce(this IMethodSymbol methodSymbol)
 		{
 			while (methodSymbol.ReducedFrom != null)
 				methodSymbol = methodSymbol.ReducedFrom;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace Cs2hx.Translations
 {
@@ -19,7 +20,7 @@ namespace Cs2hx.Translations
         public string ReplaceWith { get; set; }
 		public bool SkipGenericTypes { get; set; }
 
-		internal string Replace(Roslyn.Compilers.CSharp.NamedTypeSymbol typeInfo)
+		internal string Replace(INamedTypeSymbol typeInfo)
 		{
 			if (ReplaceWith.StartsWith("{"))
 			{

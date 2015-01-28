@@ -8,7 +8,6 @@ using System.Reflection;
 using System.IO;
 using System.Diagnostics;
 using System.Configuration;
-using Roslyn.Compilers.CSharp;
 using System.Text.RegularExpressions;
 
 

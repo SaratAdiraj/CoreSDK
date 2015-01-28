@@ -5,9 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Cs2hx.Translations;
-using Roslyn.Compilers;
-using Roslyn.Compilers.Common;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cs2hx
 {
@@ -36,18 +35,18 @@ namespace Cs2hx
 			if (attrs.ContainsKey("ReplaceWithType"))
 				return attrs["ReplaceWithType"];
 
-			var model = Program.GetModel(node).As<ISemanticModel>();
+			var model = Program.GetModel(node).As<SemanticModel>();
 			var typeInfo = model.GetTypeInfo(node);
 
-			if (typeInfo.ConvertedType is ErrorTypeSymbol)
+			if (typeInfo.ConvertedType is IErrorTypeSymbol)
 				typeInfo = model.GetTypeInfo(node.Parent); //not sure why Roslyn can't find the type of some type nodes, but telling it to use the parent's seems to work
 
 			var t = typeInfo.ConvertedType;
 			
-			if (t == null || t is ErrorTypeSymbol)
+			if (t == null || t is IErrorTypeSymbol)
 				return null;
 
-			return ConvertType((TypeSymbol)t);
+			return ConvertType((ITypeSymbol)t);
 		}
 
 		public static string ConvertTypeWithColon(SyntaxNode node)
@@ -71,7 +70,7 @@ namespace Cs2hx
 			return ret;
 		}
 
-		public static string ConvertTypeWithColon(TypeSymbol node)
+		public static string ConvertTypeWithColon(ITypeSymbol node)
 		{
 			var ret = ConvertType(node);
 
@@ -81,11 +80,11 @@ namespace Cs2hx
 				return ":" + ret;
 		}
 
-        private static ConcurrentDictionary<TypeSymbol, string> _abstractTypes = new ConcurrentDictionary<TypeSymbol, string>();
-        public static string ConvertAbstractType(TypeSymbol typeInfo)
+        private static ConcurrentDictionary<ITypeSymbol, string> _abstractTypes = new ConcurrentDictionary<ITypeSymbol, string>();
+        public static string ConvertAbstractType(ITypeSymbol typeInfo)
         {
             string cachedValue = String.Empty;
-            var operatorOverloads = typeInfo.GetMembers().Where(o => o.DeclaringSyntaxNodes.FirstOrDefault() is OperatorDeclarationSyntax).ToList();
+            var operatorOverloads = typeInfo.GetMembers().Where(o => o.DeclaringSyntaxReferences.FirstOrDefault() is OperatorDeclarationSyntax).ToList();
             if (operatorOverloads.Count > 0)
             {
                 if (_abstractTypes.TryGetValue(typeInfo, out cachedValue))
@@ -101,9 +100,9 @@ namespace Cs2hx
         }
         
 
-		private static ConcurrentDictionary<TypeSymbol, string> _cachedTypes = new ConcurrentDictionary<TypeSymbol, string>();
+		private static ConcurrentDictionary<ITypeSymbol, string> _cachedTypes = new ConcurrentDictionary<ITypeSymbol, string>();
 
-		public static string ConvertType(TypeSymbol typeInfo)
+		public static string ConvertType(ITypeSymbol typeInfo)
 		{
 			string cachedValue;
 			if (_cachedTypes.TryGetValue(typeInfo, out cachedValue))
@@ -114,12 +113,12 @@ namespace Cs2hx
 			return cachedValue;
 		}
 
-		private static string ConvertTypeUncached(TypeSymbol typeSymbol)
+		private static string ConvertTypeUncached(ITypeSymbol typeSymbol)
 		{
 			if (typeSymbol.IsAnonymousType)
-				return WriteAnonymousObjectCreationExpression.TypeName(typeSymbol.As<NamedTypeSymbol>());
+				return WriteAnonymousObjectCreationExpression.TypeName(typeSymbol.As<INamedTypeSymbol>());
 
-			var array = typeSymbol as ArrayTypeSymbol;
+			var array = typeSymbol as IArrayTypeSymbol;
 
 			if (array != null)
 			{
@@ -131,15 +130,15 @@ namespace Cs2hx
 
 			var typeInfoStr = typeSymbol.ToString();
 
-			var named = typeSymbol as NamedTypeSymbol;
+			var named = typeSymbol as INamedTypeSymbol;
 
 			if (typeSymbol.TypeKind == TypeKind.TypeParameter)
 				return typeSymbol.Name;
 
 			if (typeSymbol.TypeKind == TypeKind.Delegate)
 			{
-				var dlg = named.DelegateInvokeMethod.As<MethodSymbol>();
-				if (dlg.Parameters.Count == 0)
+				var dlg = named.DelegateInvokeMethod.As<IMethodSymbol>();
+				if (dlg.Parameters.Count() == 0)
 					return "(Void -> " + ConvertType(dlg.ReturnType) + ")";
 				else
 					return "(" + string.Join("", dlg.Parameters.ToList().Select(o => ConvertType(o.Type) + " -> ")) + ConvertType(dlg.ReturnType) + ")";
@@ -230,7 +229,7 @@ namespace Cs2hx
 
         }
 
-		private static IEnumerable<TypeSymbol> TypeArguments(NamedTypeSymbol named)
+		private static IEnumerable<ITypeSymbol> TypeArguments(INamedTypeSymbol named)
 		{
 			if (named.ContainingType != null)
 			{
@@ -261,13 +260,13 @@ namespace Cs2hx
         }
 
 
-		public static string GenericTypeName(TypeSymbol typeSymbol)
+		public static string GenericTypeName(ITypeSymbol typeSymbol)
 		{
 			if (typeSymbol == null)
 				return null;
 
-			var named = typeSymbol as NamedTypeSymbol;
-			var array = typeSymbol as ArrayTypeSymbol;
+			var named = typeSymbol as INamedTypeSymbol;
+			var array = typeSymbol as IArrayTypeSymbol;
 
 			if (array != null)
 				return GenericTypeName(array.ElementType) + "[]";

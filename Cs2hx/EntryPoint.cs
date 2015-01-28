@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -7,8 +8,10 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Xml;
 using System.Diagnostics;
-using Roslyn.Services;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using System.Collections.Immutable;
 
 namespace Cs2hx
 {
@@ -79,9 +82,10 @@ Options available:
 
 				if (pathToSolution == null)
 					throw new Exception("/sln parameter not passed");
-                var workspace = Workspace.LoadSolution(pathToSolution);
-                workspace.CurrentSolution.Projects.ToList();
-				var solution = Solution.Load(pathToSolution, config);
+
+				var workspace = MSBuildWorkspace.Create(new Dictionary<string, string>());
+                
+				var solution = workspace.OpenSolutionAsync(pathToSolution).Result;
 
 				var projectsList = solution.Projects.ToList();
 
@@ -89,8 +93,8 @@ Options available:
 					TrimList(projectsList, projects);
 
 				if (extraDefines.Length > 0)
-					projectsList = projectsList.Select(p => p.UpdateParseOptions(new ParseOptions(preprocessorSymbols: 
-						p.ParseOptions.As<ParseOptions>().PreprocessorSymbolNames
+					projectsList = projectsList.Select(p => p.WithParseOptions(new CSharpParseOptions(preprocessorSymbols: 
+						p.ParseOptions.As<Microsoft.CodeAnalysis.ParseOptions>().PreprocessorSymbolNames
 						.Concat(extraDefines.Where(z => z.StartsWith("-") == false))
 						.Except(extraDefines.Where(z => z.StartsWith("-")).Select(z => z.Substring(1)))
 						.ToArray())
@@ -99,7 +103,7 @@ Options available:
 				foreach (var project in projectsList)
 				{
 					Console.WriteLine("Building project " + project.Name + "...");
-					Program.Go((Compilation)project.GetCompilation(), outDir, extraTranslations);
+					Program.Go((Microsoft.CodeAnalysis.Compilation)project.GetCompilationAsync().Result, outDir, extraTranslations);
 				}
 
 				Environment.ExitCode = 0;
@@ -112,7 +116,7 @@ Options available:
             }
         }
 
-		private static void TrimList(List<IProject> projectsList, string projectsCsv)
+		private static void TrimList(List<Microsoft.CodeAnalysis.Project> projectsList, string projectsCsv)
 		{
 			var split = projectsCsv.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 

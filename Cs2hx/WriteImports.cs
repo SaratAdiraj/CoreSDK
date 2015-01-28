@@ -8,7 +8,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Cs2hx.Translations;
-using Roslyn.Compilers.CSharp;
 
 namespace Cs2hx
 {

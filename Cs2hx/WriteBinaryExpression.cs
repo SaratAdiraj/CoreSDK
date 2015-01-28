@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
 
 namespace Cs2hx
 {
@@ -11,8 +13,8 @@ namespace Cs2hx
 	{
 		public static void Go(HaxeWriter writer, BinaryExpressionSyntax expression)
 		{
-			//Check for index assignments, for example dictionary[4] = 3;
-			if (expression.Left is ElementAccessExpressionSyntax && expression.OperatorToken.Kind == SyntaxKind.EqualsToken)
+			//Check for index assignments, for example dictionary[4] = 3
+			if (expression.Left is ElementAccessExpressionSyntax && expression.OperatorToken.RawKind == (int)SyntaxKind.EqualsToken)
 			{
 				var elementAccess = (ElementAccessExpressionSyntax)expression.Left;
 
@@ -27,7 +29,7 @@ namespace Cs2hx
 
 
 			//Check for improper nullable access, unless it's assignment or string concat, which work fine.  Note that if they're trying to add nullable number types, it won't catch it since we can't tell if it's string concatentation or addition.  But haxe will fail to build, so it should still be caught easily enough.
-			if (expression.OperatorToken.Kind != SyntaxKind.EqualsToken && expression.OperatorToken.Kind != SyntaxKind.PlusToken)
+			if (expression.OperatorToken.RawKind != (int)SyntaxKind.EqualsToken && expression.OperatorToken.RawKind != (int)SyntaxKind.PlusToken)
 			{
 				var model = Program.GetModel(expression);
 				Func<ExpressionSyntax, bool> isNullable = e =>
@@ -51,14 +53,14 @@ namespace Cs2hx
 				//	throw new Exception("When using nullable types, you must use the .Value and .HasValue properties instead of the object directly " + Utility.Descriptor(expression));
 			}
 
-			if (expression.OperatorToken.Kind == SyntaxKind.PlusEqualsToken || expression.OperatorToken.Kind == SyntaxKind.MinusEqualsToken)
+			if (expression.OperatorToken.RawKind == (int)SyntaxKind.PlusEqualsToken || expression.OperatorToken.RawKind == (int)SyntaxKind.MinusEqualsToken)
 			{
 				//Check for event subscription/removal
 				var leftSymbol = Program.GetModel(expression).GetSymbolInfo(expression.Left);
-				if (leftSymbol.Symbol is EventSymbol)
+				if (leftSymbol.Symbol is IEventSymbol)
 				{
 					Core.Write(writer, expression.Left);
-					if (expression.OperatorToken.Kind == SyntaxKind.PlusEqualsToken)
+					if (expression.OperatorToken.RawKind == (int)SyntaxKind.PlusEqualsToken)
 						writer.Write(".Add(");
 					else
 						writer.Write(".Remove(");
@@ -69,7 +71,7 @@ namespace Cs2hx
 			}
 
 
-			if (expression.OperatorToken.Kind == SyntaxKind.AsKeyword)
+			if (expression.OperatorToken.RawKind == (int)SyntaxKind.AsKeyword)
 			{
 				var leftStr = Utility.TryGetIdentifier(expression.Left);
 
@@ -81,7 +83,7 @@ namespace Cs2hx
 				writer.Write("(Std.is(" + leftStr + ", " + typeHaxe + ") ? cast(" + leftStr + ", " + typeHaxe + ") : null)");
 
 			}
-			else if (expression.OperatorToken.Kind == SyntaxKind.IsKeyword)
+			else if (expression.OperatorToken.RawKind == (int)SyntaxKind.IsKeyword)
 			{
 				writer.Write("Std.is(");
 				Core.Write(writer, expression.Left);
@@ -89,7 +91,7 @@ namespace Cs2hx
 				writer.Write(TypeProcessor.RemoveGenericArguments(TypeProcessor.ConvertType(expression.Right)));
 				writer.Write(")");
 			}
-			else if (expression.OperatorToken.Kind == SyntaxKind.QuestionQuestionToken)
+			else if (expression.OperatorToken.RawKind == (int)SyntaxKind.QuestionQuestionToken)
 			{
 				writer.Write("Cs2Hx.Coalesce(");
 				Core.Write(writer, expression.Left);
@@ -103,10 +105,10 @@ namespace Cs2hx
 					{
 						var type = Program.GetModel(expression).GetTypeInfo(e);
 						//Check for enums being converted to strings by string concatenation
-						if (expression.OperatorToken.Kind == SyntaxKind.PlusToken && type.Type.TypeKind == TypeKind.Enum)
+					if (expression.OperatorToken.RawKind == (int)SyntaxKind.PlusToken && type.Type.TypeKind == TypeKind.Enum)
 						{
 							writer.Write(type.Type.ContainingNamespace.FullNameWithDot().ToLower());
-							writer.Write(WriteType.TypeName(type.Type.As<NamedTypeSymbol>()));
+							writer.Write(WriteType.TypeName(type.Type.As<INamedTypeSymbol>()));
 							writer.Write(".ToString(");
 							Core.Write(writer, e);
 							writer.Write(")");
@@ -139,7 +141,7 @@ namespace Cs2hx
 					}
 				};
 
-			if (operatorToken.Kind == SyntaxKind.EqualsToken)
+			if (operatorToken.RawKind == (int)SyntaxKind.EqualsToken)
 			{
 				var leftTypeHaxe = TypeProcessor.ConvertType(elementAccess.Expression);
 

@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 
 namespace Cs2hx
 {
-    class thisRewriter : SyntaxRewriter
+    class thisRewriter : CSharpSyntaxRewriter
     {
         private bool ScanningParams = true;
         private String name = "";
         public override SyntaxToken VisitToken(SyntaxToken token)
         {
-            if (token.Kind == SyntaxKind.IdentifierToken && ((token.Parent.Kind == SyntaxKind.Parameter) || (token.Parent.Parent.Kind == SyntaxKind.ParameterList) || (token.Parent.Parent.Kind == SyntaxKind.MemberAccessExpression)))
+			if (token.Kind()== SyntaxKind.IdentifierToken && ((token.Parent.Kind()== SyntaxKind.Parameter) || (token.Parent.Parent.Kind()== SyntaxKind.ParameterList) || (token.Parent.Parent.Kind() == SyntaxKind.SimpleMemberAccessExpression)))
             {
                 if (ScanningParams)
                 {
@@ -21,7 +24,7 @@ namespace Cs2hx
                     ScanningParams = false;
                 }
                 if(token.ValueText == name)
-                    return Syntax.Identifier("this");
+                    return SyntaxFactory.Identifier("this");
             }
             return token;
         }

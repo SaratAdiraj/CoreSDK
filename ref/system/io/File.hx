@@ -13,20 +13,36 @@ class File
 	
 	public static function Exists(path:String):Bool
 	{
-		return throw new NotImplementedException();
+		#if sys
+			return sys.FileSystem.exists(path);
+		#else
+			return throw new NotImplementedException();
+		#end		
 	}
 	public static function Delete(path:String):Void
 	{
-		throw new NotImplementedException();
+		#if sys
+			sys.FileSystem.deleteFile(path);
+		#else
+			return throw new NotImplementedException();
+		#end		
 	}
 	
 	public static function AppendAllText(path:String, contents:String):Void
 	{
-		throw new NotImplementedException();
+		#if sys
+			sys.io.File.append(path,false).writeString(contents);
+		#else
+			return throw new NotImplementedException();
+		#end		
 	}
 	public static function OpenRead(path:String):FileStream
 	{
-		return throw new NotImplementedException();
+		#if sys
+		    return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+		#else
+			return throw new NotImplementedException();
+		#end		
 	}
 	public static function ReadAllBytes(path:String):Bytes
 	{
